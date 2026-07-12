@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Engineering Guide by Alexandru Bratosin</title>
+    <style>
+        :root {
+            /* Light Theme */
+            --bg: #f4f4f9;
+            --surface: #ffffff;
+            --text-main: #111827;
+            --text-muted: #4b5563;
+            --accent: #111827;
+            --border: #e5e7eb;
+            --tip-bg: #f8fafc;
+            --tip-border: #3b82f6;
+            --tip-text: #1e40af;
+            --code-bg: #1e293b;
+            --code-text: #34d399;
+            --success: #059669;
+            --logo-color: #000000;
+            --icon-color: #4b5563;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #ffffff;
+            --border: #334155;
+            --tip-bg: #0f172a;
+            --tip-border: #3b82f6;
+            --tip-text: #bfdbfe;
+            --code-bg: #000000;
+            --code-text: #4ade80;
+            --success: #10b981;
+            --logo-color: #ffffff;
+            --icon-color: #94a3b8;
+        }
+
+        * { box-sizing: border-box; transition: background-color 0.2s, color 0.2s, border-color 0.2s, stroke 0.2s; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem 1rem;
+            line-height: 1.6;
+        }
+
+        .container { max-width: 950px; margin: 0 auto; }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--surface);
+            padding: 1.25rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-text h1 { margin: 0; font-size: 1.4rem; letter-spacing: -0.5px; }
+        .brand-text .status { color: var(--success); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px;}
+
+        .controls { display: flex; gap: 1rem; }
+
+        select, button {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover, select:hover { border-color: var(--text-muted); }
+
+        .section-title {
+            margin: 3rem 0 1.5rem 0;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .step-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.75rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .step-visual-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .step-number {
+            background: var(--text-main);
+            color: var(--bg);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .step-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: var(--icon-color);
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .step-content h2 { margin: 0 0 0.5rem 0; font-size: 1.3rem; }
+        .step-content p { margin: 0 0 1.25rem 0; color: var(--text-muted); }
+
+        .pro-tip {
+            background: var(--tip-bg);
+            color: var(--tip-text);
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            border-left: 4px solid var(--tip-border);
+        }
+
+        .pro-tip strong { 
+            display: flex; 
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.75rem; 
+            color: var(--text-main); 
+            font-family: -apple-system, sans-serif; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            font-size: 0.85rem;
+        }
+
+        .code-block {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            margin: 0;
+            border: 1px solid var(--border);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar { flex-direction: column; gap: 1rem; align-items: stretch; text-align: center; }
+            .brand { justify-content: center; flex-direction: column; }
+            .step-card { grid-template-columns: 1fr; text-align: left; }
+            .step-visual-col { flex-direction: row; justify-content: flex-start; margin-bottom: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="toolbar">
+        <div class="brand">
+            <!-- Custom AI Core SVG Logo -->
+            <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="25" y="25" width="50" height="50" rx="10" stroke="var(--logo-color)" stroke-width="4"/>
+                <path d="M50 10 L50 25 M50 75 L50 90 M10 50 L25 50 M75 50 L90 50" stroke="var(--logo-color)" stroke-width="4" stroke-linecap="round"/>
+                <path d="M22 22 L33 33 M78 22 L67 33 M22 78 L33 67 M78 78 L67 67" stroke="var(--logo-color)" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="50" cy="50" r="8" fill="var(--logo-color)"/>
+            </svg>
+            <div class="brand-text">
+                <h1 id="app-title">AI Prompting Masterclass</h1>
+                <span class="status">● <span id="app-status">Offline Ready</span></span>
+            </div>
+        </div>
+        <div class="controls">
+            <select id="lang-selector" onchange="renderUI()">
+                <option value="en">English (EN)</option>
+                <option value="de">Deutsch (DE)</option>
+            </select>
+            <button onclick="toggleTheme()" id="theme-btn">☀️ Light</button>
+        </div>
+    </div>
+
+    <div id="content-container"></div>
+</div>
+
+<script>
+    const svgs = {
+        role: `<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+        xml: `<svg viewBox="0 0 24 24"><path d="M18 16l4-4-4-4"/><path d="M6 8l-4 4 4 4"/><path d="M14.5 4l-5 16"/></svg>`,
+        format: `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`,
+        fewshot: `<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>`,
+        cot: `<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`,
+        chain: `<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
+        reflect: `<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>`,
+        meta: `<svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`
+    };
+
+    // Note: Escaped HTML tags inside the prompt examples using &lt; and &gt;
+    const content = {
+        en: {
+            title: "Prompt Engineering Guide by Alexandru Bratosin",
+            status: "Framework Active",
+            themeDark: "🌙 Dark",
+            themeLight: "☀️ Light",
+            phase1Title: "Phase 1: Foundations & Structure",
+            phase2Title: "Phase 2: Logic & Reasoning",
+            phase3Title: "Phase 3: Advanced Optimization",
+            phase1: [
+                { icon: "role", title: "1. Role & Context Assignment", desc: "LLMs are statistical predictors. Without a persona, they revert to a generic, average tone. Assigning a role, an audience, and explicit constraints drastically narrows the model's search space, increasing accuracy and domain-specific vocabulary.", tip: "Act as a Senior Cyber Security Analyst with 15 years of experience. \n\nTask: Write a brief for a non-technical board of directors explaining our recent firewall update.\n\nConstraints:\n- Maximum 150 words.\n- Do not use jargon (e.g., explain what a firewall is simply).\n- Maintain a reassuring but urgent tone." },
+                { icon: "xml", title: "2. XML Delimiters for Data Parsing", desc: "Modern models (especially Claude and GPT-4) are heavily trained on XML and Markdown. Delimiters prevent the AI from confusing your instructions with the raw data you want it to process.", tip: "Follow the instructions below to summarize the provided text.\n\n&lt;instructions&gt;\n1. Extract the top 3 action items.\n2. Ignore any financial data.\n&lt;/instructions&gt;\n\n&lt;text_to_analyze&gt;\n[Insert your raw, unstructured data here]\n&lt;/text_to_analyze&gt;" },
+                { icon: "format", title: "3. Strict Output Formatting", desc: "If you need data for software integration, explicitly demand a format like JSON, CSV, or Markdown tables. Provide the exact structure to prevent the AI from adding unwanted conversational text (like 'Here is your data:').", tip: "Extract all software applications mentioned in the text.\n\nYou must respond ONLY with a valid JSON object. Do not include any conversational text before or after the JSON.\n\nFormat:\n{\n  \"applications\": [\"App 1\", \"App 2\"]\n}" }
+            ],
+            phase2: [
+                { icon: "fewshot", title: "4. Few-Shot & Negative Examples", desc: "Show, don't just tell. Positive examples define the center of your target, while 'negative examples' define the boundaries, preventing the model from drifting into unwanted habits.", tip: "Classify the tone of the following customer emails into: Happy, Angry, or Neutral.\n\n&lt;example_1&gt;\nInput: 'My package is late again. Fix this!'\nOutput: Angry\n&lt;/example_1&gt;\n\n&lt;negative_example&gt;\nInput: 'Where is my order?'\nOutput: [DO NOT output 'Angry' here, this is strictly 'Neutral']\n&lt;/negative_example&gt;\n\nInput: 'Can you update my shipping address?'\nOutput:" },
+                { icon: "cot", title: "5. Chain-of-Thought (CoT)", desc: "Forcing the model to explain its reasoning step-by-step before providing the final answer reduces 'hallucinations'. It gives the model computational time to map out the logic before generating the conclusion.", tip: "How many apples does John have left if he started with 45, gave half of the remainder to Mary after eating 2, and bought 5 more?\n\nBefore answering, explain your logic step-by-step. Use a &lt;thinking&gt; tag for your calculations. Once you are absolutely certain, provide the final number in an &lt;answer&gt; tag." },
+                { icon: "chain", title: "6. Prompt Chaining", desc: "Do not ask an LLM to do five complex tasks in one massive prompt. Break the workflow down. Feed the output of Prompt A as the input for Prompt B to isolate variables and massively increase quality.", tip: "&lt;prompt_1&gt;\nAnalyze this Python script and list the 3 biggest security vulnerabilities.\n&lt;/prompt_1&gt;\n\n[Wait for Output, then open a new prompt and feed it in...]\n\n&lt;prompt_2&gt;\nTake the 3 vulnerabilities you just identified below and write a patched version of the code that fixes them.\n&lt;/prompt_2&gt;" }
+            ],
+            phase3: [
+                { icon: "reflect", title: "7. Self-Reflection & Critique", desc: "LLMs are excellent at reviewing their own work if prompted to act as an auditor. After generating a complex piece of text or code, ask the model to evaluate it against your initial constraints.", tip: "Review the code you just generated. \n\nAct as a Senior QA Tester. Look for edge cases, memory leaks, or missed constraints from my original prompt. \n\nList any flaws you find in a bulleted list, and then output the corrected code." },
+                { icon: "meta", title: "8. Meta-Prompting", desc: "Why write the prompt yourself? Models have vast vocabularies and know exactly what keywords trigger their best neural pathways. Ask the AI to interview you and write the prompt for you.", tip: "I want you to act as an expert AI Prompt Engineer. I need to generate high-converting ad copy for a new waterproof smartwatch.\n\nBefore generating the copy, ask me 3 clarifying questions about the product and target audience. Once I answer, write the perfect, highly-optimized prompt that I should use to generate the copy." }
+            ]
+        },
+        de: {
+            title: "Prompt Engineering Guide by Alexandru Bratosin",
+            status: "Framework Aktiv",
+            themeDark: "🌙 Dunkel",
+            themeLight: "☀️ Hell",
+            phase1Title: "Phase 1: Grundlagen & Struktur",
+            phase2Title: "Phase 2: Logik & Argumentation",
+            phase3Title: "Phase 3: Erweiterte Optimierung",
+            phase1: [
+                { icon: "role", title: "1. Rolle & Kontext zuweisen", desc: "Ohne eine Persona agieren KIs generisch. Die Zuweisung einer Rolle, Zielgruppe und klarer Einschränkungen verengt den Suchraum des Modells drastisch und erzwingt domänenspezifisches Vokabular.", tip: "Handle als Senior Cyber Security Analyst mit 15 Jahren Erfahrung.\n\nAufgabe: Schreibe ein Briefing für einen nicht-technischen Vorstand über unser neues Firewall-Update.\n\nEinschränkungen:\n- Maximal 150 Wörter.\n- Keine Fachsprache verwenden.\n- Beruhigender, aber eindringlicher Ton." },
+                { icon: "xml", title: "2. XML-Tags für die Datenstruktur", desc: "Moderne Modelle (wie Claude und GPT-4) reagieren extrem gut auf XML-Tags. Diese Trennzeichen verhindern, dass die KI Ihre Anweisungen mit den zu verarbeitenden Rohdaten verwechselt.", tip: "Befolge die unten stehenden Anweisungen, um den Text zusammenzufassen.\n\n&lt;anweisungen&gt;\n1. Extrahiere die wichtigsten 3 Aufgaben.\n2. Ignoriere alle finanziellen Daten.\n&lt;/anweisungen&gt;\n\n&lt;text_zur_analyse&gt;\n[Füge hier deine unstrukturierten Rohdaten ein]\n&lt;/text_zur_analyse&gt;" },
+                { icon: "format", title: "3. Strikte Ausgabeformatierung", desc: "Wenn Sie Daten für Software benötigen, fordern Sie explizit JSON, CSV oder Markdown an. Geben Sie die genaue Struktur vor, um unerwünschten Text (wie 'Hier sind Ihre Daten:') zu verhindern.", tip: "Extrahiere alle im Text erwähnten Softwareanwendungen.\n\nDu darfst AUSSCHLIESSLICH mit einem gültigen JSON-Objekt antworten. Füge keinen Text vor oder nach dem JSON hinzu.\n\nFormat:\n{\n  \"anwendungen\": [\"App 1\", \"App 2\"]\n}" }
+            ],
+            phase2: [
+                { icon: "fewshot", title: "4. Few-Shot & Negativ-Beispiele", desc: "Zeigen, nicht nur beschreiben. Positive Beispiele definieren das Ziel, während 'negative Beispiele' verhindern, dass das Modell in unerwünschte Muster abdriftet.", tip: "Klassifiziere den Ton der folgenden Kunden-E-Mails in: Glücklich, Wütend oder Neutral.\n\n&lt;beispiel_1&gt;\nInput: 'Mein Paket ist schon wieder zu spät. Behebt das!'\nOutput: Wütend\n&lt;/beispiel_1&gt;\n\n&lt;negativ_beispiel&gt;\nInput: 'Wo bleibt meine Bestellung?'\nOutput: [Gib hier NICHT 'Wütend' aus, dies ist strikt 'Neutral']\n&lt;/negativ_beispiel&gt;\n\nInput: 'Können Sie meine Lieferadresse aktualisieren?'\nOutput:" },
+                { icon: "cot", title: "5. Chain-of-Thought (Schrittweises Denken)", desc: "Zwingen Sie das Modell, seine Logik Schritt für Schritt zu erklären. Dies gibt dem Modell 'Rechenzeit', um die Logik abzubilden, bevor es eine Antwort generiert, was Halluzinationen massiv reduziert.", tip: "Wie viele Äpfel hat John noch, wenn er mit 45 begann, 2 aß, die Hälfte des Rests Mary gab und dann 5 kaufte?\n\nBevor du antwortest, erkläre deine Logik Schritt für Schritt. Nutze einen &lt;denkprozess&gt;-Tag für deine Berechnungen. Gib die endgültige Zahl in einem &lt;antwort&gt;-Tag aus." },
+                { icon: "chain", title: "6. Prompt-Verkettung (Chaining)", desc: "Geben Sie einem LLM keine fünf komplexen Aufgaben auf einmal. Zerlegen Sie den Workflow. Nutzen Sie den Output von Prompt A als Input für Prompt B, um Variablen zu isolieren.", tip: "&lt;prompt_1&gt;\nAnalysiere dieses Python-Skript und liste die 3 größten Sicherheitslücken auf.\n&lt;/prompt_1&gt;\n\n[Warte auf den Output, öffne dann einen neuen Prompt...]\n\n&lt;prompt_2&gt;\nNimm die 3 gerade identifizierten Lücken und schreibe eine gepatchte Version des Codes, die diese behebt.\n&lt;/prompt_2&gt;" }
+            ],
+            phase3: [
+                { icon: "reflect", title: "7. Selbstreflexion & Kritik", desc: "KIs eignen sich hervorragend zur Überprüfung ihrer eigenen Arbeit. Bitten Sie das Modell nach der Erstellung von Code oder Text, diesen anhand Ihrer ursprünglichen Einschränkungen zu prüfen.", tip: "Überprüfe den Code, den du gerade generiert hast.\n\nHandle als Senior QA-Tester. Suche nach Edge-Cases, Memory-Leaks oder Einschränkungen aus meinem ursprünglichen Prompt, die du übersehen hast.\n\nErstelle eine Liste der gefundenen Fehler und gib dann den korrigierten Code aus." },
+                { icon: "meta", title: "8. Meta-Prompting", desc: "Warum den Prompt selbst schreiben? Modelle kennen ihr eigenes Vokabular am besten. Bitten Sie die KI, Sie zu interviewen und den perfekten Prompt für Sie zu generieren.", tip: "Handle als Experte für AI Prompt Engineering. Ich muss einen hochkonvertierenden Werbetext für eine neue Smartwatch erstellen.\n\nBevor du den Text generierst, stelle mir 3 klärende Fragen zum Produkt und zur Zielgruppe. Sobald ich antworte, schreibe den perfekten, hochoptimierten Prompt, den ich für diese Aufgabe nutzen sollte." }
+            ]
+        }
+    };
+
+    let isDark = true;
+
+    function renderSection(title, steps, startIndex) {
+        let html = `<h3 class="section-title">${title}</h3><div class="step-grid">`;
+        steps.forEach((step, index) => {
+            html += `
+                <div class="step-card">
+                    <div class="step-visual-col">
+                        <div class="step-number">${startIndex + index}</div>
+                        <div class="step-icon">${svgs[step.icon]}</div>
+                    </div>
+                    <div class="step-content">
+                        <h2>${step.title}</h2>
+                        <p>${step.desc}</p>
+                        <div class="pro-tip">
+                            <strong>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                                Prompt Template
+                            </strong>
+                            <div class="code-block">${step.tip}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        return html;
+    }
+
+    function renderUI() {
+        const lang = document.getElementById('lang-selector').value;
+        const data = content[lang];
+        
+        document.getElementById('app-title').textContent = data.title;
+        document.getElementById('app-status').textContent = data.status;
+        document.getElementById('theme-btn').textContent = isDark ? data.themeLight : data.themeDark;
+        
+        const container = document.getElementById('content-container');
+        const p1 = data.phase1.length;
+        const p2 = data.phase2.length;
+        
+        container.innerHTML = 
+            renderSection(data.phase1Title, data.phase1, 1) + 
+            renderSection(data.phase2Title, data.phase2, p1 + 1) +
+            renderSection(data.phase3Title, data.phase3, p1 + p2 + 1);
+    }
+
+    function toggleTheme() {
+        isDark = !isDark;
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        renderUI(); 
+    }
+
+    window.onload = renderUI;
+</script>
+
+</body>
+</html>
