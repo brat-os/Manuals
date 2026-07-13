@@ -6,98 +6,151 @@
     <title>AI Prompt Engineering Guide by Alexandru Bratosin</title>
     <style>
         :root {
-            /* Light Theme */
-            --bg: #f4f4f9;
+            /* True Light Theme */
+            --bg: #f8fafc;
             --surface: #ffffff;
-            --text-main: #111827;
-            --text-muted: #4b5563;
-            --accent: #111827;
-            --border: #e5e7eb;
-            --tip-bg: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent: #2563eb;
+            --border: #e2e8f0;
+            --tip-bg: #eff6ff;
             --tip-border: #3b82f6;
-            --tip-text: #1e40af;
-            --code-bg: #1e293b;
-            --code-text: #34d399;
+            --tip-text: #1e3a8a;
+            /* Light mode prompt elements */
+            --code-bg: #f1f5f9;
+            --code-text: #334155; 
+            --code-border: #cbd5e1;
+            
             --success: #059669;
-            --logo-color: #000000;
-            --icon-color: #4b5563;
+            --logo-color: #0f172a;
+            --icon-color: #64748b;
+            
+            /* Modern Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.02);
         }
 
         [data-theme="dark"] {
-            /* Dark Theme */
-            --bg: #0f172a;
+            /* Refined Dark Theme */
+            --bg: #0b1120;
             --surface: #1e293b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --accent: #ffffff;
+            --accent: #60a5fa;
             --border: #334155;
             --tip-bg: #0f172a;
             --tip-border: #3b82f6;
             --tip-text: #bfdbfe;
+            /* Dark mode prompt elements */
             --code-bg: #000000;
-            --code-text: #4ade80;
+            --code-text: #4ade80; /* Classic terminal green for dark mode */
+            --code-border: #1e293b;
+            
             --success: #10b981;
             --logo-color: #ffffff;
             --icon-color: #94a3b8;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
         }
 
-        * { box-sizing: border-box; transition: background-color 0.2s, color 0.2s, border-color 0.2s, stroke 0.2s; }
+        * { 
+            box-sizing: border-box; 
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, stroke 0.3s ease, box-shadow 0.3s ease; 
+        }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text-main);
             margin: 0;
-            padding: 2rem 1rem;
-            line-height: 1.6;
+            padding: 2.5rem 1rem;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container { max-width: 950px; margin: 0 auto; }
+        .container { 
+            max-width: 950px; 
+            margin: 0 auto; 
+        }
 
         .toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
             background: var(--surface);
-            padding: 1.25rem 2rem;
+            padding: 1rem 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
-        .brand-text h1 { margin: 0; font-size: 1.4rem; letter-spacing: -0.5px; }
-        .brand-text .status { color: var(--success); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px;}
+        .brand-text h1 { 
+            margin: 0; 
+            font-size: 1.15rem; 
+            font-weight: 700;
+            letter-spacing: -0.3px; 
+        }
+        
+        .brand-text .status { 
+            color: var(--success); 
+            font-size: 0.8rem; 
+            font-weight: 600; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            margin-top: 2px;
+        }
 
-        .controls { display: flex; gap: 1rem; }
+        .controls { 
+            display: flex; 
+            gap: 0.75rem; 
+        }
 
         select, button {
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
             border: 1px solid var(--border);
             background: var(--surface);
             color: var(--text-main);
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             cursor: pointer;
             font-weight: 600;
+            outline: none;
+            box-shadow: var(--shadow-sm);
         }
 
-        button:hover, select:hover { border-color: var(--text-muted); }
+        button:hover, select:hover { 
+            border-color: var(--icon-color); 
+            transform: translateY(-1px);
+        }
 
         .section-title {
-            margin: 3rem 0 1.5rem 0;
-            font-size: 1.2rem;
+            margin: 3.5rem 0 1.5rem 0;
+            font-size: 0.95rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             color: var(--text-muted);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
         }
 
         .step-grid {
@@ -108,39 +161,45 @@
 
         .step-card {
             background: var(--surface);
-            border-radius: 12px;
-            padding: 1.75rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
             border: 1px solid var(--border);
             display: grid;
-            grid-template-columns: 80px 1fr;
-            gap: 1.5rem;
+            grid-template-columns: 60px 1fr;
+            gap: 1.75rem;
             align-items: start;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .step-visual-col {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
         }
 
         .step-number {
             background: var(--text-main);
             color: var(--bg);
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .step-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -156,14 +215,23 @@
             stroke-linejoin: round;
         }
 
-        .step-content h2 { margin: 0 0 0.5rem 0; font-size: 1.3rem; }
-        .step-content p { margin: 0 0 1.25rem 0; color: var(--text-muted); }
+        .step-content h2 { 
+            margin: 0 0 0.5rem 0; 
+            font-size: 1.3rem; 
+            font-weight: 700;
+        }
+        
+        .step-content p { 
+            margin: 0 0 1.5rem 0; 
+            color: var(--text-muted); 
+            font-size: 1.05rem;
+        }
 
         .pro-tip {
             background: var(--tip-bg);
             color: var(--tip-text);
-            padding: 1.25rem;
-            border-radius: 8px;
+            padding: 1.5rem;
+            border-radius: 12px;
             font-size: 0.95rem;
             border-left: 4px solid var(--tip-border);
         }
@@ -172,32 +240,33 @@
             display: flex; 
             align-items: center;
             gap: 8px;
-            margin-bottom: 0.75rem; 
+            margin-bottom: 1rem; 
             color: var(--text-main); 
-            font-family: -apple-system, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
             text-transform: uppercase; 
             letter-spacing: 1px; 
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            font-weight: 700;
         }
 
         .code-block {
             background-color: var(--code-bg);
             color: var(--code-text);
-            padding: 1rem;
-            border-radius: 6px;
+            padding: 1.25rem;
+            border-radius: 8px;
             font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
             font-size: 0.9rem;
             white-space: pre-wrap;
             margin: 0;
-            border: 1px solid var(--border);
-            line-height: 1.5;
+            border: 1px solid var(--code-border);
+            line-height: 1.6;
         }
 
         @media (max-width: 768px) {
             .toolbar { flex-direction: column; gap: 1rem; align-items: stretch; text-align: center; }
             .brand { justify-content: center; flex-direction: column; }
-            .step-card { grid-template-columns: 1fr; text-align: left; }
-            .step-visual-col { flex-direction: row; justify-content: flex-start; margin-bottom: 1rem; }
+            .step-card { grid-template-columns: 1fr; padding: 1.5rem; }
+            .step-visual-col { flex-direction: row; justify-content: flex-start; gap: 12px; margin-bottom: 0.5rem; }
         }
     </style>
 </head>
@@ -206,16 +275,18 @@
 <div class="container">
     <div class="toolbar">
         <div class="brand">
-            <!-- Custom AI Core SVG Logo -->
-            <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="25" y="25" width="50" height="50" rx="10" stroke="var(--logo-color)" stroke-width="4"/>
-                <path d="M50 10 L50 25 M50 75 L50 90 M10 50 L25 50 M75 50 L90 50" stroke="var(--logo-color)" stroke-width="4" stroke-linecap="round"/>
-                <path d="M22 22 L33 33 M78 22 L67 33 M22 78 L33 67 M78 78 L67 67" stroke="var(--logo-color)" stroke-width="4" stroke-linecap="round"/>
-                <circle cx="50" cy="50" r="8" fill="var(--logo-color)"/>
+            <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="25" y="25" width="50" height="50" rx="12" stroke="var(--logo-color)" stroke-width="5"/>
+                <path d="M50 8 L50 25 M50 75 L50 92 M8 50 L25 50 M75 50 L92 50" stroke="var(--logo-color)" stroke-width="5" stroke-linecap="round"/>
+                <path d="M20 20 L33 33 M80 20 L67 33 M20 80 L33 67 M80 80 L67 67" stroke="var(--logo-color)" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="50" cy="50" r="10" fill="var(--logo-color)"/>
             </svg>
             <div class="brand-text">
                 <h1 id="app-title">AI Prompting Masterclass</h1>
-                <span class="status">● <span id="app-status">Offline Ready</span></span>
+                <span class="status">
+                    <svg width="8" height="8" viewBox="0 0 10 10" fill="var(--success)" xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="5"/></svg>
+                    <span id="app-status">Offline Ready</span>
+                </span>
             </div>
         </div>
         <div class="controls">
@@ -242,13 +313,12 @@
         meta: `<svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`
     };
 
-    // Note: Escaped HTML tags inside the prompt examples using &lt; and &gt;
     const content = {
         en: {
             title: "Prompt Engineering Guide by Alexandru Bratosin",
             status: "Framework Active",
-            themeDark: "🌙 Dark",
-            themeLight: "☀️ Light",
+            themeDark: "🌙 Dark Mode",
+            themeLight: "☀️ Light Mode",
             phase1Title: "Phase 1: Foundations & Structure",
             phase2Title: "Phase 2: Logic & Reasoning",
             phase3Title: "Phase 3: Advanced Optimization",
@@ -270,8 +340,8 @@
         de: {
             title: "Prompt Engineering Guide by Alexandru Bratosin",
             status: "Framework Aktiv",
-            themeDark: "🌙 Dunkel",
-            themeLight: "☀️ Hell",
+            themeDark: "🌙 Dunkelmodus",
+            themeLight: "☀️ Hellmodus",
             phase1Title: "Phase 1: Grundlagen & Struktur",
             phase2Title: "Phase 2: Logik & Argumentation",
             phase3Title: "Phase 3: Erweiterte Optimierung",
@@ -327,7 +397,9 @@
         
         document.getElementById('app-title').textContent = data.title;
         document.getElementById('app-status').textContent = data.status;
-        document.getElementById('theme-btn').textContent = isDark ? data.themeLight : data.themeDark;
+        
+        const themeBtn = document.getElementById('theme-btn');
+        themeBtn.textContent = isDark ? data.themeLight : data.themeDark;
         
         const container = document.getElementById('content-container');
         const p1 = data.phase1.length;
