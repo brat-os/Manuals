@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVD on Azure Local Guide by Alexandru Bratosin</title>
+    <style>
+        :root {
+            /* True Light Theme */
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent: #0078d4; /* Microsoft Blue */
+            --border: #e2e8f0;
+            --tip-bg: #eff6ff;
+            --tip-border: #0078d4;
+            --tip-text: #1e3a8a;
+            
+            --code-bg: #f1f5f9;
+            --code-text: #334155; 
+            --code-border: #cbd5e1;
+            
+            --success: #059669;
+            --logo-color: #0f172a;
+            --icon-color: #64748b;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.02);
+            --glow: 0 0 15px rgba(0, 120, 212, 0.15);
+        }
+
+        [data-theme="dark"] {
+            /* Refined Dark Theme */
+            --bg: #0b1120;
+            --surface: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --border: #334155;
+            --tip-bg: #0f172a;
+            --tip-border: #3b82f6;
+            --tip-text: #bfdbfe;
+            
+            --code-bg: #000000;
+            --code-text: #4ade80; 
+            --code-border: #1e293b;
+            
+            --success: #10b981;
+            --logo-color: #ffffff;
+            --icon-color: #94a3b8;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+            --glow: 0 0 15px rgba(59, 130, 246, 0.25);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2.5rem 1rem;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { max-width: 950px; margin: 0 auto; }
+
+        /* Custom Tooltip Setup */
+        @media (hover: hover) {
+            [data-tooltip] {
+                position: relative;
+                cursor: help;
+            }
+            [data-tooltip]::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                bottom: calc(100% + 8px);
+                left: 50%;
+                transform: translateX(-50%) translateY(5px);
+                background: var(--text-main);
+                color: var(--bg);
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                white-space: nowrap;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                box-shadow: var(--shadow-lg);
+                z-index: 100;
+            }
+            [data-tooltip]::before {
+                content: "";
+                position: absolute;
+                bottom: calc(100% + 2px);
+                left: 50%;
+                transform: translateX(-50%) translateY(5px);
+                border-width: 6px;
+                border-style: solid;
+                border-color: var(--text-main) transparent transparent transparent;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                z-index: 100;
+            }
+            [data-tooltip]:hover::after,
+            [data-tooltip]:hover::before {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(-50%) translateY(0);
+            }
+            [data-tooltip-pos="bottom"]::after {
+                bottom: auto; top: calc(100% + 8px);
+            }
+            [data-tooltip-pos="bottom"]::before {
+                bottom: auto; top: calc(100% + 2px);
+                border-color: transparent transparent var(--text-main) transparent;
+            }
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--surface);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-text h1 { margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.3px; }
+        .brand-text .status { 
+            color: var(--success); font-size: 0.8rem; font-weight: 600; 
+            display: flex; align-items: center; gap: 6px; margin-top: 2px; width: max-content;
+        }
+
+        .controls { display: flex; gap: 0.75rem; }
+
+        select, button {
+            padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text-main); font-size: 0.85rem;
+            cursor: pointer; font-weight: 600; outline: none; box-shadow: var(--shadow-sm);
+        }
+        button:hover, select:hover { border-color: var(--icon-color); transform: translateY(-1px); }
+
+        /* Modern Architecture Diagram */
+        .diagram-container {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .diagram-title {
+            font-size: 0.9rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 2rem;
+        }
+        .arch-flow {
+            display: flex; justify-content: center; align-items: center; gap: 1rem;
+        }
+        .arch-node {
+            background: var(--bg); border: 2px solid var(--border); border-radius: 12px;
+            padding: 1.5rem; flex: 1; max-width: 220px; display: flex; flex-direction: column;
+            align-items: center; gap: 12px; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .arch-node:hover {
+            transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--glow);
+        }
+        .arch-node svg {
+            width: 48px; height: 48px; stroke: var(--text-main); fill: none; stroke-width: 1.5;
+        }
+        .arch-node .node-title {
+            font-size: 0.95rem; font-weight: 700; color: var(--text-main);
+        }
+        .arch-connector {
+            display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted);
+        }
+        .arch-connector svg {
+            width: 40px; height: 16px; stroke: var(--text-muted); stroke-width: 2; fill: none;
+        }
+
+        .section-title {
+            margin: 2rem 0 1.5rem 0; font-size: 0.95rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .section-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+        .step-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+        .step-card {
+            background: var(--surface); border-radius: 16px; padding: 2rem;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border); display: grid;
+            grid-template-columns: 60px 1fr; gap: 1.75rem; align-items: start;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .step-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+        .step-visual-col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .step-number {
+            background: var(--text-main); color: var(--bg); width: 32px; height: 32px;
+            border-radius: 8px; display: flex; justify-content: center; align-items: center;
+            font-weight: 800; font-size: 1rem; cursor: default;
+        }
+        .step-icon { width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
+        .step-icon svg {
+            width: 100%; height: 100%; stroke: var(--icon-color); fill: none;
+            stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+        }
+
+        .step-content h2 { margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 700; }
+        .step-content p { margin: 0 0 1.5rem 0; color: var(--text-muted); font-size: 1.05rem; }
+
+        .pro-tip {
+            background: var(--tip-bg); color: var(--tip-text); padding: 1.5rem;
+            border-radius: 12px; font-size: 0.95rem; border-left: 4px solid var(--tip-border);
+        }
+        .pro-tip strong { 
+            display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; 
+            color: var(--text-main); font-family: sans-serif; text-transform: uppercase; 
+            letter-spacing: 1px; font-size: 0.8rem; font-weight: 700;
+        }
+
+        .code-block {
+            background-color: var(--code-bg); color: var(--code-text); padding: 1.25rem;
+            border-radius: 8px; font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 0.85rem; white-space: pre-wrap; margin: 0;
+            border: 1px solid var(--code-border); line-height: 1.5; overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar { flex-direction: column; gap: 1rem; align-items: stretch; text-align: center; }
+            .brand { justify-content: center; flex-direction: column; }
+            .arch-flow { flex-direction: column; }
+            .arch-connector svg { transform: rotate(90deg); height: 40px; width: 16px; margin: 8px 0; }
+            .arch-node { max-width: 100%; width: 100%; }
+            .step-card { grid-template-columns: 1fr; padding: 1.5rem; }
+            .step-visual-col { flex-direction: row; justify-content: flex-start; gap: 12px; margin-bottom: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="toolbar">
+        <div class="brand">
+            <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="20" y="20" width="60" height="25" rx="4" stroke="var(--logo-color)" stroke-width="5"/>
+                <rect x="20" y="55" width="60" height="25" rx="4" stroke="var(--logo-color)" stroke-width="5"/>
+                <circle cx="35" cy="32.5" r="4" fill="var(--logo-color)"/>
+                <circle cx="35" cy="67.5" r="4" fill="var(--logo-color)"/>
+            </svg>
+            <div class="brand-text">
+                <h1 id="app-title">AVD on Azure Local Guide by Alexandru Bratosin</h1>
+                <span class="status" id="status-badge" data-tooltip-pos="bottom">
+                    <svg width="8" height="8" viewBox="0 0 10 10" fill="var(--success)" xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="5"/></svg>
+                    <span id="app-status">Hybrid Cloud Active</span>
+                </span>
+            </div>
+        </div>
+        <div class="controls">
+            <select id="lang-selector" onchange="renderUI()" data-tooltip="Change Language" data-tooltip-pos="bottom">
+                <option value="en">English (EN)</option>
+                <option value="de">Deutsch (DE)</option>
+            </select>
+            <button onclick="toggleTheme()" id="theme-btn" data-tooltip="Toggle Dark/Light Mode" data-tooltip-pos="bottom">☀️ Light</button>
+        </div>
+    </div>
+
+    <div class="diagram-container">
+        <div class="diagram-title" id="diagram-title-text">Architecture Overview</div>
+        
+        <div class="arch-flow">
+            <div class="arch-node" id="tt-node1" data-tooltip="Global Azure Control Plane">
+                <svg viewBox="0 0 24 24"><path d="M17.5 19C19.9853 19 22 16.9853 22 14.5C22 12.1388 20.1837 10.2018 17.8654 10.0195C17.4475 6.62343 14.5501 4 11 4C7.13401 4 4 7.13401 4 11C4 11.2384 4.01198 11.4741 4.03522 11.7061C2.31495 12.3853 1 14.0326 1 16C1 18.2091 2.79086 20 5 20H17.5V19Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="node-title" id="lbl-node1">Azure Cloud</div>
+            </div>
+            
+            <div class="arch-connector" id="tt-conn1" data-tooltip="Secure HTTPS Outbound">
+                <svg viewBox="0 0 40 16" preserveAspectRatio="none">
+                    <path d="M0,8 L36,8" stroke-dasharray="4,4" /><path d="M32,3 L38,8 L32,13" />
+                </svg>
+            </div>
+            
+            <div class="arch-node" id="tt-node2" data-tooltip="Connects On-Prem to Azure">
+                <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="node-title" id="lbl-node2">Azure Arc Bridge</div>
+            </div>
+            
+            <div class="arch-connector" id="tt-conn2" data-tooltip="Local Provisioning">
+                <svg viewBox="0 0 40 16" preserveAspectRatio="none">
+                    <path d="M0,8 L36,8" stroke-dasharray="4,4" /><path d="M32,3 L38,8 L32,13" />
+                </svg>
+            </div>
+            
+            <div class="arch-node" id="tt-node3" data-tooltip="Your Physical Hardware (HCI)">
+                <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 8h.01M10 8h.01M14 8h.01M6 16h.01M10 16h.01M14 16h.01" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="node-title" id="lbl-node3">Azure Local (AVD)</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-container"></div>
+</div>
+
+<script>
+    const svgs = {
+        cluster: `<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M6 16h.01M10 16h.01M14 16h.01"/></svg>`,
+        arc: `<svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+        network: `<svg viewBox="0 0 24 24"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3M12 8v3"/></svg>`,
+        vm: `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`,
+        hostpool: `<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>`,
+        agent: `<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`,
+        fslogix: `<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
+        rdp: `<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>`
+    };
+
+    const content = {
+        en: {
+            title: "AVD on Azure Local Guide by Alexandru Bratosin",
+            status: "Hybrid Cloud Active",
+            themeDark: "🌙 Dark Mode",
+            themeLight: "☀️ Light Mode",
+            statusTooltip: "Services are connected",
+            diagramTitle: "Architecture Overview",
+            tooltips: {
+                node1: "Global Azure Control Plane (Portal/WVD)",
+                node2: "Azure Arc Resource Bridge",
+                node3: "Your Physical Hardware (Azure Stack HCI)",
+                conn1: "Secure HTTPS Outbound",
+                conn2: "Local Provisioning API"
+            },
+            phase1Title: "Phase 1: Hybrid Infrastructure Prep",
+            phase2Title: "Phase 2: Provisioning & Deployment",
+            phase3Title: "Phase 3: Performance & User Experience",
+            phase1: [
+                { icon: "cluster", tooltip: "Setup Infrastructure", title: "1. Azure Local Cluster Readiness", desc: "Before deploying AVD, your Azure Local (Azure Stack HCI) cluster must be fully deployed, registered with Azure, and operational. Ensure all physical nodes are updated and Arc-enabled.", tip: "# Verify cluster registration status\nGet-AzureStackHCI\n\n# Ensure Arc Resource Bridge is running\nGet-MocConfig\nGet-ArcAppliance -Name 'arc-bridge' -ResourceGroupName 'rg-hci'" },
+                { icon: "arc", tooltip: "Bridge Connection", title: "2. Custom Location & Arc VM Management", desc: "Azure Virtual Desktop on Azure Local requires a Custom Location in Azure. This bridges the gap between the Azure control plane and your on-premises hardware, allowing you to deploy VMs directly from the Azure Portal.", tip: "az customlocation create \\\n  --resource-group rg-hci \\\n  --name cl-avd-local \\\n  --cluster-extension-ids $extensionId \\\n  --namespace default \\\n  --host-resource-id $clusterId" },
+                { icon: "hostpool", tooltip: "Cloud Control Plane", title: "3. Create the AVD Host Pool", desc: "You must create the Host Pool object in Azure. Crucially, when selecting the location for the virtual machines, you will target your newly created Azure Local Custom Location instead of a standard Azure Region.", tip: "# Create a Host Pool via Azure CLI\naz desktopvirtualization hostpool create \\\n  --resource-group rg-avd \\\n  --name hp-avd-local \\\n  --location eastus \\\n  --host-pool-type Pooled \\\n  --load-balancer-type BreadthFirst \\\n  --custom-rdp-property \"audiocapturemode:i:1;camerastoredirect:s:*;\"" }
+            ],
+            phase2: [
+                { icon: "vm", tooltip: "OS Provisioning", title: "4. Image Preparation (Windows 11 M-S)", desc: "To get the true AVD experience on-premises, use the Windows 11 Multi-Session image. Download it from the Azure Marketplace to your Azure Local cluster, install required apps (M365), and Sysprep it.", tip: "# Add Azure Marketplace image to Azure Local\naz stack-hci-vm image create \\\n  --resource-group rg-hci \\\n  --custom-location cl-avd-local \\\n  --name win11-ms-image \\\n  --publisher MicrosoftWindowsDesktop \\\n  --offer windows-11 \\\n  --sku win11-22h2-avd" },
+                { icon: "network", tooltip: "Compute Creation", title: "5. Deploy Arc-Enabled Session Hosts", desc: "Provision the Virtual Machines directly onto your Azure Local hardware using Azure CLI or the Portal. Ensure they are attached to a logical network that can route to your Active Directory / Entra ID.", tip: "az stack-hci-vm create \\\n  --name avd-host-01 \\\n  --resource-group rg-avd \\\n  --custom-location cl-avd-local \\\n  --image win11-ms-image \\\n  --logical-network lnet-avd \\\n  --memory 16 \\\n  --v-cpus 4" },
+                { icon: "agent", tooltip: "WVD Connection", title: "6. Join Domain & Install AVD Agents", desc: "Once the VMs are running, they must be joined to your domain. After that, install the AVD Agent (RDAgent) and Bootloader, passing the Host Pool registration token to connect them to the Azure Control Plane.", tip: "# Fetch Registration Token\n$token = (Get-AzWvdRegistrationInfo -ResourceGroupName rg-avd -HostPoolName hp-avd-local).Token\n\n# Install Agent silently (Example)\nStart-Process -FilePath \".\\Microsoft.RDInfra.RDAgent.Installer.exe\" -ArgumentList \"/quiet /norestart REGISTRATIONTOKEN=$token\" -Wait" }
+            ],
+            phase3: [
+                { icon: "fslogix", tooltip: "User Profiles", title: "7. Configure FSLogix Profile Containers", desc: "Since users can land on any VM in the pool, you must roam their profiles. Set up an SMB file share directly on your Azure Local cluster (or a nearby NAS) and configure the FSLogix registry keys on the session hosts.", tip: "# Set FSLogix Registry Keys\nSet-ItemProperty -Path \"HKLM:\\SOFTWARE\\FSLogix\\Profiles\" -Name \"Enabled\" -Value 1 -Type DWord\nSet-ItemProperty -Path \"HKLM:\\SOFTWARE\\FSLogix\\Profiles\" -Name \"VHDLocations\" -Value \"\\\\hci-cluster\\profileshare\" -Type String\nSet-ItemProperty -Path \"HKLM:\\SOFTWARE\\FSLogix\\Profiles\" -Name \"IsDynamic\" -Value 1 -Type DWord" },
+                { icon: "rdp", tooltip: "Network Optimization", title: "8. Enable RDP Shortpath", desc: "For on-premises users connecting to on-premises AVD VMs, bouncing traffic through the Azure Gateway adds latency. Enable RDP Shortpath for Managed Networks to establish a direct UDP connection locally.", tip: "# Enable RDP Shortpath listener on Session Hosts\nNew-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\" -Name \"fUseUdpPortRedirector\" -Value 1 -PropertyType DWord -Force\n\n# Note: Ensure UDP port 3390 is allowed through local network firewalls." }
+            ]
+        },
+        de: {
+            title: "AVD auf Azure Local Guide von Alexandru Bratosin",
+            status: "Hybrid Cloud Aktiv",
+            themeDark: "🌙 Dunkelmodus",
+            themeLight: "☀️ Hellmodus",
+            statusTooltip: "Dienste sind verbunden",
+            diagramTitle: "Architekturübersicht",
+            tooltips: {
+                node1: "Globale Azure Control Plane (Portal/WVD)",
+                node2: "Azure Arc Resource Bridge",
+                node3: "Ihre Physische Hardware (Azure Stack HCI)",
+                conn1: "Sicherer HTTPS-Ausgang",
+                conn2: "Lokale Bereitstellungs-API"
+            },
+            phase1Title: "Phase 1: Vorbereitung der Hybrid-Infrastruktur",
+            phase2Title: "Phase 2: Bereitstellung & Provisionierung",
+            phase3Title: "Phase 3: Leistung & Benutzererfahrung",
+            phase1: [
+                { icon: "cluster", tooltip: "Infrastruktur-Setup", title: "1. Azure Local Cluster Bereitschaft", desc: "Bevor AVD bereitgestellt wird, muss Ihr Azure Local (Azure Stack HCI) Cluster registriert und betriebsbereit sein. Stellen Sie sicher, dass alle Knoten aktualisiert und Arc-fähig sind.", tip: "# Cluster-Registrierungsstatus überprüfen\nGet-AzureStackHCI\n\n# Arc Resource Bridge überprüfen\nGet-MocConfig\nGet-ArcAppliance -Name 'arc-bridge' -ResourceGroupName 'rg-hci'" },
+                { icon: "arc", tooltip: "Brückenverbindung", title: "2. Custom Location & Arc VM Management", desc: "AVD auf Azure Local erfordert eine Custom Location in Azure. Diese schlägt die Brücke zwischen der Azure Control Plane und Ihrer lokalen Hardware, sodass Sie VMs über das Azure-Portal bereitstellen können.", tip: "az customlocation create \\\n  --resource-group rg-hci \\\n  --name cl-avd-local \\\n  --cluster-extension-ids $extensionId \\\n  --namespace default \\\n  --host-resource-id $clusterId" },
+                { icon: "hostpool", tooltip: "Cloud Control Plane", title: "3. AVD Host-Pool erstellen", desc: "Sie müssen das Host-Pool-Objekt in Azure erstellen. Wenn Sie den Standort für die virtuellen Maschinen auswählen, zielen Sie auf Ihre neue Azure Local Custom Location anstelle einer Standard-Azure-Region ab.", tip: "# Host-Pool via Azure CLI erstellen\naz desktopvirtualization hostpool create \\\n  --resource-group rg-avd \\\n  --name hp-avd-local \\\n  --location eastus \\\n  --host-pool-type Pooled \\\n  --load-balancer-type BreadthFirst \\\n  --custom-rdp-property \"audiocapturemode:i:1;camerastoredirect:s:*;\"" }
+            ],
+            phase2: [
+                { icon: "vm", tooltip: "OS Provisionierung", title: "4. Image-Vorbereitung (Windows 11 M-S)", desc: "Laden Sie das Windows 11 Multi-Session-Image aus dem Azure Marketplace auf Ihren Azure Local Cluster herunter. Installieren Sie erforderliche Apps (M365) und führen Sie Sysprep aus.", tip: "# Azure Marketplace Image hinzufügen\naz stack-hci-vm image create \\\n  --resource-group rg-hci \\\n  --custom-location cl-avd-local \\\n  --name win11-ms-image \\\n  --publisher MicrosoftWindowsDesktop \\\n  --offer windows-11 \\\n  --sku win11-22h2-avd" },
+                { icon: "network", tooltip: "Compute-Erstellung", title: "5. Arc-fähige Session-Hosts bereitstellen", desc: "Provisionieren Sie die VMs direkt auf Ihrer Azure Local-Hardware mithilfe der Azure CLI. Stellen Sie sicher, dass sie mit einem Netzwerk verbunden sind, das zu Ihrem Active Directory / Entra ID routen kann.", tip: "az stack-hci-vm create \\\n  --name avd-host-01 \\\n  --resource-group rg-avd \\\n  --custom-location cl-avd-local \\\n  --image win11-ms-image \\\n  --logical-network lnet-avd \\\n  --memory 16 \\\n  --v-cpus 4" },
+                { icon: "agent", tooltip: "WVD Verbindung", title: "6. Domänenbeitritt & AVD-Agenten", desc: "Die laufenden VMs müssen der Domäne beitreten. Installieren Sie danach den AVD-Agenten (RDAgent) und den Bootloader und übergeben Sie das Registrierungs-Token, um sie mit Azure zu verbinden.", tip: "# Registrierungs-Token abrufen\n$token = (Get-AzWvdRegistrationInfo -ResourceGroupName rg-avd -HostPoolName hp-avd-local).Token\n\n# Agenten silent installieren (Beispiel)\nStart-Process -FilePath \".\\Microsoft.RDInfra.RDAgent.Installer.exe\" -ArgumentList \"/quiet /norestart REGISTRATIONTOKEN=$token\" -Wait" }
+            ],
+            phase3: [
+                { icon: "fslogix", tooltip: "Benutzerprofile", title: "7. FSLogix Profil-Container konfigurieren", desc: "Da Benutzer auf jeder VM landen können, müssen ihre Profile mitwandern. Richten Sie eine SMB-Dateifreigabe direkt auf Ihrem Azure Local Cluster ein und konfigurieren Sie die FSLogix-Registry-Keys.", tip: "# FSLogix Registry Keys setzen\nSet-ItemProperty -Path \"HKLM:\\SOFTWARE\\FSLogix\\Profiles\" -Name \"Enabled\" -Value 1 -Type DWord\nSet-ItemProperty -Path \"HKLM:\\SOFTWARE\\FSLogix\\Profiles\" -Name \"VHDLocations\" -Value \"\\\\hci-cluster\\profileshare\" -Type String\nSet-ItemProperty -Path \"HKLM:\\SOFTWARE\\FSLogix\\Profiles\" -Name \"IsDynamic\" -Value 1 -Type DWord" },
+                { icon: "rdp", tooltip: "Netzwerk-Optimierung", title: "8. RDP Shortpath aktivieren", desc: "Für lokale Benutzer, die sich mit lokalen AVD-VMs verbinden, erhöht das Routing über das Azure-Gateway die Latenz. Aktivieren Sie RDP Shortpath für verwaltete Netzwerke, um direkt über UDP zu kommunizieren.", tip: "# RDP Shortpath auf Session-Hosts aktivieren\nNew-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\" -Name \"fUseUdpPortRedirector\" -Value 1 -PropertyType DWord -Force\n\n# Hinweis: UDP-Port 3390 muss in der lokalen Firewall erlaubt sein." }
+            ]
+        }
+    };
+
+    let isDark = true;
+
+    function renderSection(title, steps, startIndex) {
+        let html = `<h3 class="section-title">${title}</h3><div class="step-grid">`;
+        steps.forEach((step, index) => {
+            html += `
+                <div class="step-card">
+                    <div class="step-visual-col">
+                        <div class="step-number" data-tooltip="${step.tooltip}">${startIndex + index}</div>
+                        <div class="step-icon">${svgs[step.icon]}</div>
+                    </div>
+                    <div class="step-content">
+                        <h2>${step.title}</h2>
+                        <p>${step.desc}</p>
+                        <div class="pro-tip">
+                            <strong>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                                Deployment Snippet
+                            </strong>
+                            <div class="code-block">${step.tip}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        return html;
+    }
+
+    function renderUI() {
+        const lang = document.getElementById('lang-selector').value;
+        const data = content[lang];
+        
+        // Update Static Headers
+        document.getElementById('app-title').textContent = data.title;
+        document.getElementById('app-status').textContent = data.status;
+        document.getElementById('status-badge').setAttribute('data-tooltip', data.statusTooltip);
+        document.getElementById('diagram-title-text').textContent = data.diagramTitle;
+        
+        // Update Diagram Tooltips
+        document.getElementById('tt-node1').setAttribute('data-tooltip', data.tooltips.node1);
+        document.getElementById('tt-node2').setAttribute('data-tooltip', data.tooltips.node2);
+        document.getElementById('tt-node3').setAttribute('data-tooltip', data.tooltips.node3);
+        document.getElementById('tt-conn1').setAttribute('data-tooltip', data.tooltips.conn1);
+        document.getElementById('tt-conn2').setAttribute('data-tooltip', data.tooltips.conn2);
+        
+        // Update Theme Button
+        const themeBtn = document.getElementById('theme-btn');
+        themeBtn.textContent = isDark ? data.themeLight : data.themeDark;
+        
+        // Render Steps
+        const container = document.getElementById('content-container');
+        const p1 = data.phase1.length;
+        const p2 = data.phase2.length;
+        
+        container.innerHTML = 
+            renderSection(data.phase1Title, data.phase1, 1) + 
+            renderSection(data.phase2Title, data.phase2, p1 + 1) +
+            renderSection(data.phase3Title, data.phase3, p1 + p2 + 1);
+    }
+
+    function toggleTheme() {
+        isDark = !isDark;
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        renderUI(); 
+    }
+
+    // Initialize on load
+    window.onload = renderUI;
+</script>
+
+</body>
+</html>
