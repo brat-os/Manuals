@@ -6,49 +6,129 @@
     <title>Starlink Master Guide by Alexandru Bratosin</title>
     <style>
         :root {
-            /* Light Theme */
+            /* True Light Theme */
             --bg: #f8fafc;
             --surface: #ffffff;
             --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent: #0f172a;
+            --text-muted: #475569;
+            --accent: #0284c7; /* Starlink / Sky Blue */
             --border: #e2e8f0;
             --tip-bg: #f0f9ff;
             --tip-border: #0284c7;
             --tip-text: #0369a1;
+            
+            --code-bg: #f1f5f9;
+            --code-text: #334155; 
+            --code-border: #cbd5e1;
+            
             --success: #059669;
-            --logo-color: #000000;
-            --icon-color: #334155;
+            --logo-color: #0f172a;
+            --icon-color: #64748b;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.02);
+            --glow: 0 0 15px rgba(2, 132, 199, 0.15);
         }
 
         [data-theme="dark"] {
-            /* Dark Theme */
-            --bg: #0f172a;
+            /* Refined Dark Theme */
+            --bg: #0b1120;
             --surface: #1e293b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --accent: #ffffff;
+            --accent: #38bdf8;
             --border: #334155;
-            --tip-bg: #0c4a6e;
+            --tip-bg: #0f172a;
             --tip-border: #38bdf8;
             --tip-text: #bae6fd;
+            
+            --code-bg: #000000;
+            --code-text: #4ade80; /* Classic terminal green */
+            --code-border: #1e293b;
+            
             --success: #10b981;
             --logo-color: #ffffff;
             --icon-color: #94a3b8;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+            --glow: 0 0 15px rgba(56, 189, 248, 0.25);
         }
 
-        * { box-sizing: border-box; transition: background-color 0.2s, color 0.2s, border-color 0.2s, stroke 0.2s; }
+        * { 
+            box-sizing: border-box; 
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; 
+        }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             color: var(--text-main);
             margin: 0;
-            padding: 2rem 1rem;
-            line-height: 1.6;
+            padding: 2.5rem 1rem;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 950px; margin: 0 auto; }
+
+        /* Custom Tooltip Setup */
+        @media (hover: hover) {
+            [data-tooltip] {
+                position: relative;
+                cursor: help;
+            }
+            [data-tooltip]::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                bottom: calc(100% + 8px);
+                left: 50%;
+                transform: translateX(-50%) translateY(5px);
+                background: var(--text-main);
+                color: var(--bg);
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                white-space: nowrap;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                box-shadow: var(--shadow-lg);
+                z-index: 100;
+            }
+            [data-tooltip]::before {
+                content: "";
+                position: absolute;
+                bottom: calc(100% + 2px);
+                left: 50%;
+                transform: translateX(-50%) translateY(5px);
+                border-width: 6px;
+                border-style: solid;
+                border-color: var(--text-main) transparent transparent transparent;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                z-index: 100;
+            }
+            [data-tooltip]:hover::after,
+            [data-tooltip]:hover::before {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(-50%) translateY(0);
+            }
+            [data-tooltip-pos="bottom"]::after {
+                bottom: auto; top: calc(100% + 8px);
+            }
+            [data-tooltip-pos="bottom"]::before {
+                bottom: auto; top: calc(100% + 2px);
+                border-color: transparent transparent var(--text-main) transparent;
+            }
+        }
 
         .toolbar {
             display: flex;
@@ -56,121 +136,122 @@
             align-items: center;
             margin-bottom: 2rem;
             background: var(--surface);
-            padding: 1.25rem 2rem;
+            padding: 1rem 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-text h1 { margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.3px; }
+        .brand-text .status { 
+            color: var(--success); font-size: 0.8rem; font-weight: 600; 
+            display: flex; align-items: center; gap: 6px; margin-top: 2px; width: max-content;
         }
 
-        .brand-text h1 { margin: 0; font-size: 1.4rem; letter-spacing: -0.5px; }
-        .brand-text .status { color: var(--success); font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px;}
-
-        .controls { display: flex; gap: 1rem; }
+        .controls { display: flex; gap: 0.75rem; }
 
         select, button {
-            padding: 0.6rem 1.2rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text-main);
-            font-size: 0.95rem;
-            cursor: pointer;
-            font-weight: 600;
+            padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text-main); font-size: 0.85rem;
+            cursor: pointer; font-weight: 600; outline: none; box-shadow: var(--shadow-sm);
         }
+        button:hover, select:hover { border-color: var(--icon-color); transform: translateY(-1px); }
 
-        button:hover, select:hover { border-color: var(--text-muted); }
+        /* Modern Architecture Diagram */
+        .diagram-container {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .diagram-title {
+            font-size: 0.9rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 2rem;
+        }
+        .arch-flow {
+            display: flex; justify-content: center; align-items: center; gap: 1rem;
+        }
+        .arch-node {
+            background: var(--bg); border: 2px solid var(--border); border-radius: 12px;
+            padding: 1.5rem; flex: 1; max-width: 220px; display: flex; flex-direction: column;
+            align-items: center; gap: 12px; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .arch-node:hover {
+            transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--glow);
+        }
+        .arch-node svg {
+            width: 48px; height: 48px; stroke: var(--text-main); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+        }
+        .arch-node .node-title {
+            font-size: 0.95rem; font-weight: 700; color: var(--text-main);
+        }
+        .arch-connector {
+            display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted);
+        }
+        .arch-connector svg {
+            width: 40px; height: 16px; stroke: var(--text-muted); stroke-width: 2; fill: none;
+        }
 
         .section-title {
-            margin: 2.5rem 0 1.5rem 0;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0.5rem;
+            margin: 2rem 0 1.5rem 0; font-size: 0.95rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);
+            display: flex; align-items: center; gap: 12px;
         }
+        .section-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
 
-        .step-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
+        .step-grid { display: flex; flex-direction: column; gap: 1.5rem; }
         .step-card {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid var(--border);
-            display: grid;
-            grid-template-columns: 80px 1fr;
-            gap: 1.5rem;
-            align-items: start;
+            background: var(--surface); border-radius: 16px; padding: 2rem;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border); display: grid;
+            grid-template-columns: 60px 1fr; gap: 1.75rem; align-items: start;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+        .step-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
 
-        .step-visual-col {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .step-visual-col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
         .step-number {
-            background: var(--text-main);
-            color: var(--bg);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 700;
-            font-size: 1rem;
+            background: var(--text-main); color: var(--bg); width: 32px; height: 32px;
+            border-radius: 8px; display: flex; justify-content: center; align-items: center;
+            font-weight: 800; font-size: 1rem; cursor: default;
         }
-
-        .step-icon {
-            width: 48px;
-            height: 48px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
+        .step-icon { width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
         .step-icon svg {
-            width: 100%;
-            height: 100%;
-            stroke: var(--icon-color);
-            fill: none;
-            stroke-width: 1.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
+            width: 100%; height: 100%; stroke: var(--icon-color); fill: none;
+            stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
         }
 
-        .step-content h2 { margin: 0 0 0.5rem 0; font-size: 1.25rem; }
-        .step-content p { margin: 0 0 1rem 0; color: var(--text-muted); }
+        .step-content h2 { margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 700; }
+        .step-content p { margin: 0 0 1.5rem 0; color: var(--text-muted); font-size: 1.05rem; }
 
         .pro-tip {
-            background: var(--tip-bg);
-            color: var(--tip-text);
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            border-left: 4px solid var(--tip-border);
+            background: var(--tip-bg); color: var(--tip-text); padding: 1.5rem;
+            border-radius: 12px; font-size: 0.95rem; border-left: 4px solid var(--tip-border);
+        }
+        .pro-tip strong { 
+            display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; 
+            color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, sans-serif; text-transform: uppercase; 
+            letter-spacing: 1px; font-size: 0.8rem; font-weight: 700;
         }
 
-        .pro-tip strong { display: block; margin-bottom: 0.25rem; color: var(--text-main); }
+        .code-block {
+            background-color: var(--code-bg); color: var(--code-text); padding: 1.25rem;
+            border-radius: 8px; font-family: "SFMono-Regular", Consolas, monospace;
+            font-size: 0.9rem; white-space: pre-wrap; margin: 0;
+            border: 1px solid var(--code-border); line-height: 1.6; overflow-x: auto;
+        }
 
         @media (max-width: 768px) {
             .toolbar { flex-direction: column; gap: 1rem; align-items: stretch; text-align: center; }
             .brand { justify-content: center; flex-direction: column; }
-            .step-card { grid-template-columns: 1fr; text-align: center; }
-            .step-visual-col { flex-direction: row; justify-content: center; margin-bottom: 1rem; }
+            .arch-flow { flex-direction: column; }
+            .arch-connector svg { transform: rotate(90deg); height: 40px; width: 16px; margin: 8px 0; }
+            .arch-node { max-width: 100%; width: 100%; }
+            .step-card { grid-template-columns: 1fr; padding: 1.5rem; }
+            .step-visual-col { flex-direction: row; justify-content: flex-start; gap: 12px; margin-bottom: 0.5rem; }
         }
     </style>
 </head>
@@ -179,7 +260,7 @@
 <div class="container">
     <div class="toolbar">
         <div class="brand">
-            <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="50" cy="50" r="42" stroke="var(--logo-color)" stroke-width="4" stroke-dasharray="8 6" opacity="0.3"/>
                 <path d="M15 75 A 45 45 0 0 1 85 75" stroke="var(--logo-color)" stroke-width="5" stroke-linecap="round"/>
                 <path d="M30 60 A 25 25 0 0 1 70 60" stroke="var(--logo-color)" stroke-width="5" stroke-linecap="round"/>
@@ -189,16 +270,59 @@
                 <circle cx="65" cy="25" r="3" fill="var(--logo-color)"/>
             </svg>
             <div class="brand-text">
-                <h1 id="app-title">Starlink Setup Guide</h1>
-                <span class="status">● <span id="app-status">System Ready</span></span>
+                <h1 id="app-title">Starlink Master Guide</h1>
+                <span class="status" id="status-badge" data-tooltip-pos="bottom">
+                    <svg width="8" height="8" viewBox="0 0 10 10" fill="var(--success)" xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="5"/></svg>
+                    <span id="app-status">System Ready</span>
+                </span>
             </div>
         </div>
         <div class="controls">
-            <select id="lang-selector" onchange="renderUI()">
+            <select id="lang-selector" onchange="renderUI()" data-tooltip="Change Language" data-tooltip-pos="bottom">
                 <option value="en">English (EN)</option>
                 <option value="de">Deutsch (DE)</option>
             </select>
-            <button onclick="toggleTheme()" id="theme-btn">☀️ Light</button>
+            <button onclick="toggleTheme()" id="theme-btn" data-tooltip="Toggle Dark/Light Mode" data-tooltip-pos="bottom">☀️ Light</button>
+        </div>
+    </div>
+
+    <!-- Redesigned Starlink Flexbox Diagram -->
+    <div class="diagram-container">
+        <div class="diagram-title" id="diagram-title-text">Architecture Overview</div>
+        
+        <div class="arch-flow">
+            <div class="arch-node" id="tt-node1" data-tooltip="Phased Array Antenna">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 21L12 14M9 21h6M3 9a9 9 0 0 1 18 0M3 9c0 3 4 5 9 5s9-2 9-5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="node-title" id="lbl-node1">Starlink Dish</div>
+            </div>
+            
+            <div class="arch-connector" id="tt-conn1" data-tooltip="Proprietary SPX Cable">
+                <svg viewBox="0 0 40 16" preserveAspectRatio="none">
+                    <path d="M0,8 L36,8" stroke-dasharray="4,4" /><path d="M32,3 L38,8 L32,13" />
+                </svg>
+            </div>
+            
+            <div class="arch-node" id="tt-node2" data-tooltip="Gen 2 / Gen 3 Hub">
+                <svg viewBox="0 0 24 24">
+                    <rect x="6" y="4" width="12" height="16" rx="2"/><circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+                </svg>
+                <div class="node-title" id="lbl-node2">Starlink Router</div>
+            </div>
+            
+            <div class="arch-connector" id="tt-conn2" data-tooltip="2.4GHz / 5GHz Connection">
+                <svg viewBox="0 0 40 16" preserveAspectRatio="none">
+                    <path d="M0,8 L36,8" stroke-dasharray="4,4" /><path d="M32,3 L38,8 L32,13" />
+                </svg>
+            </div>
+            
+            <div class="arch-node" id="tt-node3" data-tooltip="Phones, Laptops, IoT">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20M12 16v4"/>
+                </svg>
+                <div class="node-title" id="lbl-node3">Client Devices</div>
+            </div>
         </div>
     </div>
 
@@ -206,7 +330,7 @@
 </div>
 
 <script>
-    // Embedded SVG library for step instructions
+    // Embedded SVG library for step instructions[cite: 2]
     const svgs = {
         survey: `<svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5z"/><path d="M12 7v.01M8 11h8M12 11v6"/></svg>`,
         assembly: `<svg viewBox="0 0 24 24"><path d="M12 18v4M7 22h10M4 10.5a8.5 8.5 0 1 0 16 0"/><path d="M12 18L12 10.5"/></svg>`,
@@ -229,67 +353,85 @@
         en: {
             title: "Starlink Setup Guide by Alexandru Bratosin",
             status: "System Ready",
-            themeDark: "🌙 Dark",
-            themeLight: "☀️ Light",
+            themeDark: "🌙 Dark Mode",
+            themeLight: "☀️ Light Mode",
+            statusTooltip: "Satellites online",
+            diagramTitle: "Architecture Overview",
+            tooltips: {
+                node1: "Phased Array Antenna",
+                node2: "Gen 2 / Gen 3 Hub",
+                node3: "Phones, Laptops, IoT",
+                conn1: "Proprietary SPX Cable",
+                conn2: "Wi-Fi 2.4/5 GHz Signal"
+            },
             hwTitle: "Phase 1: Hardware Deployment",
             swTitle: "Phase 2: Software & Network",
             tsTitle: "Phase 3: Troubleshooting",
             advTitle: "Phase 4: Advanced Diagnostics & Pro Tips",
             hardware: [
-                { icon: "survey", title: "Site Survey & Obstruction Check", desc: "Starlink requires a completely unobstructed 110-degree field of view of the sky. Trees, buildings, or poles will interrupt the phased array tracking.", tip: "Use the Starlink App's AR scanner tool before permanently mounting. Stand exactly where the dish will go, at the exact height. A 1% obstruction can cause significant gaming and VoIP drops." },
-                { icon: "assembly", title: "Inventory & Assembly", desc: "Unbox the dish, base/mast, router, SPX cable, and AC power cable. Insert the mast into the base until it clicks. Plug the proprietary SPX connector into the dish.", tip: "Ensure the connector is perfectly flush. A loose connection at the dish side is the #1 cause of 'Dish Unreachable' errors. You should hear/feel a click." },
-                { icon: "cable", title: "Cable Routing & Drip Loop", desc: "Route the cable from the outside mount to the inside of the building. Avoid sharp 90-degree bends, pinching in windows, or crushing with staples.", tip: "Create a 'Drip Loop' (a U-shaped bend) just before the cable enters the exterior wall. This forces rainwater to drip off the bottom of the loop rather than flowing down the cable into your masonry." },
-                { icon: "router", title: "Router Placement & Power", desc: "Place the router in a central, elevated location (at least 3 feet / 1 meter off the ground). Plug the dish cable into the router, then plug the router into AC power.", tip: "Keep the router away from dense materials (brick, concrete, metal panels), aquariums, and microwaves. Wait up to 5 minutes; the dish may physically articulate to orient itself." }
+                { icon: "survey", tooltip: "Setup Planning", title: "Site Survey & Obstruction Check", desc: "Starlink requires a completely unobstructed 110-degree field of view of the sky. Trees, buildings, or poles will interrupt the phased array tracking.", tip: "Use the Starlink App's AR scanner tool before permanently mounting. Stand exactly where the dish will go, at the exact height. A 1% obstruction can cause significant gaming and VoIP drops." },
+                { icon: "assembly", tooltip: "Physical Setup", title: "Inventory & Assembly", desc: "Unbox the dish, base/mast, router, SPX cable, and AC power cable. Insert the mast into the base until it clicks. Plug the proprietary SPX connector into the dish.", tip: "Ensure the connector is perfectly flush. A loose connection at the dish side is the #1 cause of 'Dish Unreachable' errors. You should hear/feel a click." },
+                { icon: "cable", tooltip: "Wiring", title: "Cable Routing & Drip Loop", desc: "Route the cable from the outside mount to the inside of the building. Avoid sharp 90-degree bends, pinching in windows, or crushing with staples.", tip: "Create a 'Drip Loop' (a U-shaped bend) just before the cable enters the exterior wall. This forces rainwater to drip off the bottom of the loop rather than flowing down the cable into your masonry." },
+                { icon: "router", tooltip: "Hub Power", title: "Router Placement & Power", desc: "Place the router in a central, elevated location (at least 3 feet / 1 meter off the ground). Plug the dish cable into the router, then plug the router into AC power.", tip: "Keep the router away from dense materials (brick, concrete, metal panels), aquariums, and microwaves. Wait up to 5 minutes; the dish may physically articulate to orient itself." }
             ],
             software: [
-                { icon: "wifi", title: "Initial Network Boot", desc: "Wait for the router LED indicator to stabilize. Open your phone or laptop's Wi-Fi settings and look for an unsecured network named 'STARLINK' or 'STINKY'. Connect to it.", tip: "If the default network does not appear after 10 minutes, power cycle the router by unplugging and replugging the AC cable 6 times rapidly to factory reset it." },
-                { icon: "security", title: "App Configuration & Security", desc: "Open the Starlink App. It will immediately prompt you to configure your network. Enter a custom SSID (Network Name) and a secure WPA2/WPA3 password. Save the settings.", tip: "Once you save, your device will be disconnected from the default network. You must manually go back into your device's Wi-Fi settings and connect to your newly created secure network." },
-                { icon: "split", title: "Advanced Network Splitting", desc: "By default, Starlink combines the 2.4 GHz and 5 GHz bands. Navigate to 'Settings > Network' in the app to configure advanced options.", tip: "Toggle 'Split 2.4 / 5 GHz networks'. This is highly recommended for smart home devices (IoT, cameras, smart plugs) which often fail to connect to combined bands." },
-                { icon: "bypass", title: "Bypass Mode (Third-Party Routers)", desc: "If you are using your own high-end mesh system (e.g., Ubiquiti, Eero), you need to disable the built-in Starlink Wi-Fi routing capabilities.", tip: "In the app settings, enable 'Bypass Mode'. Note: You will need the Starlink Ethernet Adapter (sold separately for standard models) to connect your third-party router to the Starlink system." }
+                { icon: "wifi", tooltip: "Initial Sync", title: "Initial Network Boot", desc: "Wait for the router LED indicator to stabilize. Open your phone or laptop's Wi-Fi settings and look for an unsecured network named 'STARLINK' or 'STINKY'. Connect to it.", tip: "If the default network does not appear after 10 minutes, power cycle the router by unplugging and replugging the AC cable 6 times rapidly to factory reset it." },
+                { icon: "security", tooltip: "Lock Down", title: "App Configuration & Security", desc: "Open the Starlink App. It will immediately prompt you to configure your network. Enter a custom SSID (Network Name) and a secure WPA2/WPA3 password. Save the settings.", tip: "Once you save, your device will be disconnected from the default network. You must manually go back into your device's Wi-Fi settings and connect to your newly created secure network." },
+                { icon: "split", tooltip: "Band Options", title: "Advanced Network Splitting", desc: "By default, Starlink combines the 2.4 GHz and 5 GHz bands. Navigate to 'Settings > Network' in the app to configure advanced options.", tip: "Toggle 'Split 2.4 / 5 GHz networks'. This is highly recommended for smart home devices (IoT, cameras, smart plugs) which often fail to connect to combined bands." },
+                { icon: "bypass", tooltip: "Bridge Mode", title: "Bypass Mode (Third-Party Routers)", desc: "If you are using your own high-end mesh system (e.g., Ubiquiti, Eero), you need to disable the built-in Starlink Wi-Fi routing capabilities.", tip: "In the app settings, enable 'Bypass Mode'. Note: You will need the Starlink Ethernet Adapter (sold separately for standard models) to connect your third-party router to the Starlink system." }
             ],
             troubleshooting: [
-                { icon: "disconnected", title: "App shows 'Disconnected' or 'Starlink Unreachable'", desc: "The router cannot communicate with the dish. This is almost always a physical cable issue.", tip: "Check the connector at the dish. It requires significant force to seat properly. Look for any dirt or debris in the plug before re-inserting." },
-                { icon: "slow", title: "Slow Speeds or Intermittent Drops", desc: "Micro-drops are usually caused by tiny obstructions, while overall slow speeds can be due to router placement or initial network mapping.", tip: "Allow 12-24 hours for the system to download the latest firmware and map the satellite constellations. Ensure the router isn't hidden inside a media cabinet." },
-                { icon: "reset", title: "Router Light is Solid Red or Unresponsive", desc: "A red light indicates a boot failure or lack of internet routing. No light indicates a power supply issue.", tip: "Perform a hard reset by rapidly unplugging and replugging the router's power cable 6 times. Wait 5 minutes for it to broadcast the default 'STARLINK' Wi-Fi again." }
+                { icon: "disconnected", tooltip: "Offline Issues", title: "App shows 'Disconnected' or 'Starlink Unreachable'", desc: "The router cannot communicate with the dish. This is almost always a physical cable issue.", tip: "Check the connector at the dish. It requires significant force to seat properly. Look for any dirt or debris in the plug before re-inserting." },
+                { icon: "slow", tooltip: "Speed Drops", title: "Slow Speeds or Intermittent Drops", desc: "Micro-drops are usually caused by tiny obstructions, while overall slow speeds can be due to router placement or initial network mapping.", tip: "Allow 12-24 hours for the system to download the latest firmware and map the satellite constellations. Ensure the router isn't hidden inside a media cabinet." },
+                { icon: "reset", tooltip: "Hard Restarts", title: "Router Light is Solid Red or Unresponsive", desc: "A red light indicates a boot failure or lack of internet routing. No light indicates a power supply issue.", tip: "Perform a hard reset by rapidly unplugging and replugging the router's power cable 6 times. Wait 5 minutes for it to broadcast the default 'STARLINK' Wi-Fi again." }
             ],
             advanced: [
-                { icon: "shield", title: "Weatherproofing Mastery", desc: "Moisture ingress is the leading cause of hardware failure. Treat outdoor connectors and entry points with extreme care.", tip: "Drill exterior wall holes at a slight downward angle from inside to out to prevent water from tracking inward. Apply a tiny amount of dielectric silicone grease to the plastic edges of outdoor connectors to prevent oxidation." },
-                { icon: "ruler", title: "Hardware Specifics & Limits", desc: "Different generations of Starlink hardware have different physical tolerances and power requirements.", tip: "Gen 3 (Standard) dishes use RJ45 cables but draw up to 180W. Never extend the cable past 150ft (50m) with third-party couplers, or you will experience voltage drops and phantom disconnects. Never manually force aim a Gen 2 actuated dish." },
-                { icon: "terminal", title: "Deep App Diagnostics", desc: "Don't guess what is causing connection issues. Use the Starlink App's internal debug terminal.", tip: "Navigate to 'Settings > Advanced > Debug Data' and look at the 'Cable Ping Drop Rate'. If this number is anything above 0%, your cable is not seated perfectly flush, or it has been physically pinched/damaged." },
-                { icon: "power", title: "Power & Snow Melt Management", desc: "The Starlink dish intentionally generates heat to melt snow and ice accumulation, which uses a massive amount of electricity.", tip: "If you are running your system off a battery bank, a solar setup, or simply live in a warm climate, change the 'Snow Melt Configuration' in the app from 'Automatic' to 'Off' to save significant power." }
+                { icon: "shield", tooltip: "Element Protection", title: "Weatherproofing Mastery", desc: "Moisture ingress is the leading cause of hardware failure. Treat outdoor connectors and entry points with extreme care.", tip: "Drill exterior wall holes at a slight downward angle from inside to out to prevent water from tracking inward. Apply a tiny amount of dielectric silicone grease to the plastic edges of outdoor connectors to prevent oxidation." },
+                { icon: "ruler", tooltip: "Voltages", title: "Hardware Specifics & Limits", desc: "Different generations of Starlink hardware have different physical tolerances and power requirements.", tip: "Gen 3 (Standard) dishes use RJ45 cables but draw up to 180W. Never extend the cable past 150ft (50m) with third-party couplers, or you will experience voltage drops and phantom disconnects. Never manually force aim a Gen 2 actuated dish." },
+                { icon: "terminal", tooltip: "Debug Tools", title: "Deep App Diagnostics", desc: "Don't guess what is causing connection issues. Use the Starlink App's internal debug terminal.", tip: "Navigate to 'Settings > Advanced > Debug Data' and look at the 'Cable Ping Drop Rate'. If this number is anything above 0%, your cable is not seated perfectly flush, or it has been physically pinched/damaged." },
+                { icon: "power", tooltip: "Thermal Settings", title: "Power & Snow Melt Management", desc: "The Starlink dish intentionally generates heat to melt snow and ice accumulation, which uses a massive amount of electricity.", tip: "If you are running your system off a battery bank, a solar setup, or simply live in a warm climate, change the 'Snow Melt Configuration' in the app from 'Automatic' to 'Off' to save significant power." }
             ]
         },
         de: {
-            title: "Starlink Setup Anleitung",
+            title: "Starlink Setup Anleitung von Alexandru Bratosin",
             status: "System Bereit",
-            themeDark: "🌙 Dunkel",
-            themeLight: "☀️ Hell",
+            themeDark: "🌙 Dunkelmodus",
+            themeLight: "☀️ Hellmodus",
+            statusTooltip: "Satelliten online",
+            diagramTitle: "Architekturübersicht",
+            tooltips: {
+                node1: "Phased-Array-Antenne",
+                node2: "Gen 2 / Gen 3 Router",
+                node3: "Handys, Laptops, IoT",
+                conn1: "Proprietäres SPX-Kabel",
+                conn2: "WLAN 2.4/5 GHz Signal"
+            },
             hwTitle: "Phase 1: Hardware-Bereitstellung",
             swTitle: "Phase 2: Software & Netzwerk",
             tsTitle: "Phase 3: Fehlerbehebung",
             advTitle: "Phase 4: Erweiterte Diagnose & Profi-Tipps",
             hardware: [
-                { icon: "survey", title: "Standortanalyse & Hindernisse", desc: "Starlink benötigt ein absolut freies 110-Grad-Sichtfeld zum Himmel. Bäume, Gebäude oder Masten stören das Phased-Array-Tracking.", tip: "Nutzen Sie den AR-Scanner der App vor der endgültigen Montage. Selbst eine Blockade von 1% kann zu Verbindungsabbrüchen bei Spielen und VoIP-Anrufen führen." },
-                { icon: "assembly", title: "Inventar & Montage", desc: "Entpacken Sie Antenne, Standfuß, Router, SPX-Kabel und Netzkabel. Stecken Sie den Mast in den Fuß. Verbinden Sie den proprietären SPX-Stecker mit der Antenne.", tip: "Der Stecker muss absolut bündig sitzen. Eine lockere Verbindung ist die häufigste Ursache für den Fehler 'Antenne nicht erreichbar'. Es muss spürbar einrasten." },
-                { icon: "cable", title: "Kabelverlegung & Tropfschlaufe", desc: "Verlegen Sie das Kabel von außen nach innen. Vermeiden Sie scharfe 90-Grad-Knicke, das Einklemmen in Fenstern oder die Befestigung mit harten Klammern.", tip: "Bilden Sie eine 'Tropfschlaufe' (ein U-förmiger Bogen), bevor das Kabel durch die Außenwand geführt wird. So tropft Regenwasser ab und fließt nicht ins Mauerwerk." },
-                { icon: "router", title: "Router-Platzierung & Strom", desc: "Platzieren Sie den Router zentral und erhöht (mind. 1 Meter über dem Boden). Verbinden Sie das Antennenkabel mit dem Router und stecken Sie das Netzkabel ein.", tip: "Halten Sie den Router fern von dichten Materialien (Ziegel, Beton, Metall), Aquarien und Mikrowellen. Warten Sie bis zu 5 Minuten; motorisierte Antennen richten sich nun physisch aus." }
+                { icon: "survey", tooltip: "Aufbauplanung", title: "Standortanalyse & Hindernisse", desc: "Starlink benötigt ein absolut freies 110-Grad-Sichtfeld zum Himmel. Bäume, Gebäude oder Masten stören das Phased-Array-Tracking.", tip: "Nutzen Sie den AR-Scanner der App vor der endgültigen Montage. Selbst eine Blockade von 1% kann zu Verbindungsabbrüchen bei Spielen und VoIP-Anrufen führen." },
+                { icon: "assembly", tooltip: "Physischer Aufbau", title: "Inventar & Montage", desc: "Entpacken Sie Antenne, Standfuß, Router, SPX-Kabel und Netzkabel. Stecken Sie den Mast in den Fuß. Verbinden Sie den proprietären SPX-Stecker mit der Antenne.", tip: "Der Stecker muss absolut bündig sitzen. Eine lockere Verbindung ist die häufigste Ursache für den Fehler 'Antenne nicht erreichbar'. Es muss spürbar einrasten." },
+                { icon: "cable", tooltip: "Verkabelung", title: "Kabelverlegung & Tropfschlaufe", desc: "Verlegen Sie das Kabel von außen nach innen. Vermeiden Sie scharfe 90-Grad-Knicke, das Einklemmen in Fenstern oder die Befestigung mit harten Klammern.", tip: "Bilden Sie eine 'Tropfschlaufe' (ein U-förmiger Bogen), bevor das Kabel durch die Außenwand geführt wird. So tropft Regenwasser ab und fließt nicht ins Mauerwerk." },
+                { icon: "router", tooltip: "Stromversorgung", title: "Router-Platzierung & Strom", desc: "Platzieren Sie den Router zentral und erhöht (mind. 1 Meter über dem Boden). Verbinden Sie das Antennenkabel mit dem Router und stecken Sie das Netzkabel ein.", tip: "Halten Sie den Router fern von dichten Materialien (Ziegel, Beton, Metall), Aquarien und Mikrowellen. Warten Sie bis zu 5 Minuten; motorisierte Antennen richten sich nun physisch aus." }
             ],
             software: [
-                { icon: "wifi", title: "Erster Netzwerkstart", desc: "Warten Sie, bis die Router-LED stabil leuchtet. Suchen Sie in den WLAN-Einstellungen Ihres Geräts nach einem offenen Netzwerk namens 'STARLINK' oder 'STINKY' und verbinden Sie sich.", tip: "Erscheint das Netzwerk nach 10 Minuten nicht, ziehen Sie den Netzstecker 6-mal schnell hintereinander heraus und stecken ihn wieder ein, um einen Werksreset durchzuführen." },
-                { icon: "security", title: "App-Konfiguration & Sicherheit", desc: "Öffnen Sie die Starlink-App. Sie werden sofort aufgefordert, Ihr Netzwerk einzurichten. Vergeben Sie eine eigene SSID (Netzwerkname) und ein sicheres Passwort. Speichern Sie ab.", tip: "Nach dem Speichern wird Ihr Gerät vom Standardnetzwerk getrennt. Sie müssen nun manuell in Ihre WLAN-Einstellungen gehen und sich mit Ihrem neuen, sicheren Netzwerk verbinden." },
-                { icon: "split", title: "Erweiterte Netzwerktrennung", desc: "Standardmäßig kombiniert Starlink das 2,4-GHz- und 5-GHz-Band. Gehen Sie in der App zu 'Einstellungen > Netzwerk' für erweiterte Optionen.", tip: "Aktivieren Sie '2,4 / 5 GHz Netzwerke trennen'. Dies wird dringend für Smart-Home-Geräte (IoT, Kameras) empfohlen, da diese bei kombinierten Bändern oft Verbindungsprobleme haben." },
-                { icon: "bypass", title: "Bypass-Modus (Drittanbieter-Router)", desc: "Wenn Sie ein eigenes Mesh-System (z. B. Ubiquiti, Eero) verwenden, müssen Sie die integrierte WLAN-Routing-Funktion von Starlink deaktivieren.", tip: "Aktivieren Sie in der App den 'Bypass-Modus'. Hinweis: Sie benötigen den Starlink-Ethernet-Adapter (separat erhältlich für Standardmodelle), um Ihren eigenen Router anzuschließen." }
+                { icon: "wifi", tooltip: "Erste Kopplung", title: "Erster Netzwerkstart", desc: "Warten Sie, bis die Router-LED stabil leuchtet. Suchen Sie in den WLAN-Einstellungen Ihres Geräts nach einem offenen Netzwerk namens 'STARLINK' oder 'STINKY' und verbinden Sie sich.", tip: "Erscheint das Netzwerk nach 10 Minuten nicht, ziehen Sie den Netzstecker 6-mal schnell hintereinander heraus und stecken ihn wieder ein, um einen Werksreset durchzuführen." },
+                { icon: "security", tooltip: "Absicherung", title: "App-Konfiguration & Sicherheit", desc: "Öffnen Sie die Starlink-App. Sie werden sofort aufgefordert, Ihr Netzwerk einzurichten. Vergeben Sie eine eigene SSID (Netzwerkname) und ein sicheres Passwort. Speichern Sie ab.", tip: "Nach dem Speichern wird Ihr Gerät vom Standardnetzwerk getrennt. Sie müssen nun manuell in Ihre WLAN-Einstellungen gehen und sich mit Ihrem neuen, sicheren Netzwerk verbinden." },
+                { icon: "split", tooltip: "Frequenzbänder", title: "Erweiterte Netzwerktrennung", desc: "Standardmäßig kombiniert Starlink das 2,4-GHz- und 5-GHz-Band. Gehen Sie in der App zu 'Einstellungen > Netzwerk' für erweiterte Optionen.", tip: "Aktivieren Sie '2,4 / 5 GHz Netzwerke trennen'. Dies wird dringend für Smart-Home-Geräte (IoT, Kameras) empfohlen, da diese bei kombinierten Bändern oft Verbindungsprobleme haben." },
+                { icon: "bypass", tooltip: "Bridge-Modus", title: "Bypass-Modus (Drittanbieter-Router)", desc: "Wenn Sie ein eigenes Mesh-System (z. B. Ubiquiti, Eero) verwenden, müssen Sie die integrierte WLAN-Routing-Funktion von Starlink deaktivieren.", tip: "Aktivieren Sie in der App den 'Bypass-Modus'. Hinweis: Sie benötigen den Starlink-Ethernet-Adapter (separat erhältlich für Standardmodelle), um Ihren eigenen Router anzuschließen." }
             ],
             troubleshooting: [
-                { icon: "disconnected", title: "App zeigt 'Getrennt' oder 'Starlink nicht erreichbar'", desc: "Der Router kann nicht mit der Antenne kommunizieren. Dies ist fast immer ein physisches Kabelproblem.", tip: "Überprüfen Sie den Stecker an der Antenne. Er erfordert etwas Kraft, um richtig einzurasten. Achten Sie auf Schmutz im Stecker, bevor Sie ihn wieder einstecken." },
-                { icon: "slow", title: "Langsame Geschwindigkeiten oder Abbrüche", desc: "Mikro-Abbrüche werden meist durch winzige Hindernisse verursacht, während generelle Langsamkeit an der Router-Platzierung oder der initialen Netzwerk-Kartierung liegen kann.", tip: "Geben Sie dem System 12-24 Stunden Zeit, um die neueste Firmware herunterzuladen und die Satellitenkonstellationen zu kartieren. Verstecken Sie den Router nicht in einem geschlossenen Schrank." },
-                { icon: "reset", title: "Router-LED leuchtet rot oder reagiert nicht", desc: "Ein rotes Licht signalisiert einen Startfehler oder fehlendes Internet. Kein Licht deutet auf ein Stromproblem hin.", tip: "Führen Sie einen Hard-Reset durch, indem Sie das Stromkabel 6-mal schnell hintereinander aus- und einstecken. Warten Sie 5 Minuten, bis das Standard-WLAN 'STARLINK' wieder erscheint." }
+                { icon: "disconnected", tooltip: "Offline Fehler", title: "App zeigt 'Getrennt' oder 'Starlink nicht erreichbar'", desc: "Der Router kann nicht mit der Antenne kommunizieren. Dies ist fast immer ein physisches Kabelproblem.", tip: "Überprüfen Sie den Stecker an der Antenne. Er erfordert etwas Kraft, um richtig einzurasten. Achten Sie auf Schmutz im Stecker, bevor Sie ihn wieder einstecken." },
+                { icon: "slow", tooltip: "Geschwindigkeit", title: "Langsame Geschwindigkeiten oder Abbrüche", desc: "Mikro-Abbrüche werden meist durch winzige Hindernisse verursacht, während generelle Langsamkeit an der Router-Platzierung oder der initialen Netzwerk-Kartierung liegen kann.", tip: "Geben Sie dem System 12-24 Stunden Zeit, um die neueste Firmware herunterzuladen und die Satellitenkonstellationen zu kartieren. Verstecken Sie den Router nicht in einem geschlossenen Schrank." },
+                { icon: "reset", tooltip: "Neustart", title: "Router-LED leuchtet rot oder reagiert nicht", desc: "Ein rotes Licht signalisiert einen Startfehler oder fehlendes Internet. Kein Licht deutet auf ein Stromproblem hin.", tip: "Führen Sie einen Hard-Reset durch, indem Sie das Stromkabel 6-mal schnell hintereinander aus- und einstecken. Warten Sie 5 Minuten, bis das Standard-WLAN 'STARLINK' wieder erscheint." }
             ],
             advanced: [
-                { icon: "shield", title: "Meisterhafter Wetterschutz", desc: "Eindringende Feuchtigkeit ist die Hauptursache für Hardwareausfälle. Behandeln Sie Außenanschlüsse mit äußerster Sorgfalt.", tip: "Bohren Sie Löcher in Außenwände von innen nach außen leicht abwärts, damit Wasser nicht nach innen fließen kann. Tragen Sie eine winzige Menge dielektrisches Silikonfett auf die Kunststoffkanten der Außenstecker auf, um Oxidation zu verhindern." },
-                { icon: "ruler", title: "Hardware-Grenzen & Kabellängen", desc: "Verschiedene Starlink-Generationen haben unterschiedliche physikalische Toleranzen und Stromanforderungen.", tip: "Gen 3 Standard-Antennen nutzen RJ45-Kabel, ziehen aber bis zu 180W. Verlängern Sie das Kabel nie mit Drittanbieter-Kupplungen über 50m hinaus, sonst drohen Spannungsabfälle und Verbindungsabbrüche. Richten Sie motorisierte Gen 2 Antennen niemals mit physischer Gewalt manuell aus." },
-                { icon: "terminal", title: "Tiefgreifende App-Diagnose", desc: "Raten Sie nicht, was die Verbindungsprobleme verursacht. Nutzen Sie das interne Debug-Terminal der Starlink-App.", tip: "Gehen Sie zu 'Einstellungen > Erweitert > Debug-Daten' und prüfen Sie die 'Kabel-Ping-Verlustrate'. Ist dieser Wert höher als 0%, sitzt Ihr Kabel nicht bündig oder wurde physisch eingeklemmt/beschädigt." },
-                { icon: "power", title: "Strom- & Schneeschmelz-Management", desc: "Die Starlink-Antenne erzeugt absichtlich Wärme, um Schnee und Eis zu schmelzen. Dies verbraucht massiv Strom.", tip: "Wenn Sie Ihr System über eine Batteriebank oder Solaranlage betreiben oder in einem warmen Klima leben, stellen Sie die 'Schneeschmelze' in der App von 'Automatisch' auf 'Aus', um erheblich Energie zu sparen." }
+                { icon: "shield", tooltip: "Witterungsschutz", title: "Meisterhafter Wetterschutz", desc: "Eindringende Feuchtigkeit ist die Hauptursache für Hardwareausfälle. Behandeln Sie Außenanschlüsse mit äußerster Sorgfalt.", tip: "Bohren Sie Löcher in Außenwände von innen nach außen leicht abwärts, damit Wasser nicht nach innen fließen kann. Tragen Sie eine winzige Menge dielektrisches Silikonfett auf die Kunststoffkanten der Außenstecker auf, um Oxidation zu verhindern." },
+                { icon: "ruler", tooltip: "Spannung", title: "Hardware-Grenzen & Kabellängen", desc: "Verschiedene Starlink-Generationen haben unterschiedliche physikalische Toleranzen und Stromanforderungen.", tip: "Gen 3 Standard-Antennen nutzen RJ45-Kabel, ziehen aber bis zu 180W. Verlängern Sie das Kabel nie mit Drittanbieter-Kupplungen über 50m hinaus, sonst drohen Spannungsabfälle und Verbindungsabbrüche. Richten Sie motorisierte Gen 2 Antennen niemals mit physischer Gewalt manuell aus." },
+                { icon: "terminal", tooltip: "Debug Tools", title: "Tiefgreifende App-Diagnose", desc: "Raten Sie nicht, was die Verbindungsprobleme verursacht. Nutzen Sie das interne Debug-Terminal der Starlink-App.", tip: "Gehen Sie zu 'Einstellungen > Erweitert > Debug-Daten' und prüfen Sie die 'Kabel-Ping-Verlustrate'. Ist dieser Wert höher als 0%, sitzt Ihr Kabel nicht bündig oder wurde physisch eingeklemmt/beschädigt." },
+                { icon: "power", tooltip: "Temperaturen", title: "Strom- & Schneeschmelz-Management", desc: "Die Starlink-Antenne erzeugt absichtlich Wärme, um Schnee und Eis zu schmelzen. Dies verbraucht massiv Strom.", tip: "Wenn Sie Ihr System über eine Batteriebank oder Solaranlage betreiben oder in einem warmen Klima leben, stellen Sie die 'Schneeschmelze' in der App von 'Automatisch' auf 'Aus', um erheblich Energie zu sparen." }
             ]
         }
     };
@@ -302,14 +444,18 @@
             html += `
                 <div class="step-card">
                     <div class="step-visual-col">
-                        <div class="step-number">${startIndex + index}</div>
+                        <div class="step-number" data-tooltip="${step.tooltip}">${startIndex + index}</div>
                         <div class="step-icon">${svgs[step.icon]}</div>
                     </div>
                     <div class="step-content">
                         <h2>${step.title}</h2>
                         <p>${step.desc}</p>
                         <div class="pro-tip">
-                            <strong>PRO TIP</strong> ${step.tip}
+                            <strong>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                Pro Tip
+                            </strong>
+                            <div class="code-block">${step.tip}</div>
                         </div>
                     </div>
                 </div>
@@ -323,14 +469,29 @@
         const lang = document.getElementById('lang-selector').value;
         const data = content[lang];
         
+        // Update Static Headers
         document.getElementById('app-title').textContent = data.title;
         document.getElementById('app-status').textContent = data.status;
-        document.getElementById('theme-btn').textContent = isDark ? data.themeLight : data.themeDark;
+        document.getElementById('status-badge').setAttribute('data-tooltip', data.statusTooltip);
+        document.getElementById('diagram-title-text').textContent = data.diagramTitle;
         
+        // Update Diagram Tooltips
+        document.getElementById('tt-node1').setAttribute('data-tooltip', data.tooltips.node1);
+        document.getElementById('tt-node2').setAttribute('data-tooltip', data.tooltips.node2);
+        document.getElementById('tt-node3').setAttribute('data-tooltip', data.tooltips.node3);
+        document.getElementById('tt-conn1').setAttribute('data-tooltip', data.tooltips.conn1);
+        document.getElementById('tt-conn2').setAttribute('data-tooltip', data.tooltips.conn2);
+        
+        // Update Theme Button
+        const themeBtn = document.getElementById('theme-btn');
+        themeBtn.textContent = isDark ? data.themeLight : data.themeDark;
+        
+        // Render all 4 phases
         const container = document.getElementById('content-container');
         const hwCount = data.hardware.length;
         const swCount = data.software.length;
         const tsCount = data.troubleshooting.length;
+        const advCount = data.advanced.length;
         
         container.innerHTML = 
             renderSection(data.hwTitle, data.hardware, 1) + 
@@ -345,6 +506,7 @@
         renderUI(); 
     }
 
+    // Initialize on load
     window.onload = renderUI;
 </script>
 
