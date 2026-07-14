@@ -9,21 +9,27 @@
             /* True Light Theme */
             --bg: #f8fafc;
             --surface: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #475569;
+            
+            /* Enforced Black Text */
+            --text-main: #000000;
+            --text-muted: #000000;
+            --tip-text: #000000;
+            
             --accent: #0284c7; /* Starlink / Sky Blue */
             --border: #e2e8f0;
             --tip-bg: #f0f9ff;
             --tip-border: #0284c7;
-            --tip-text: #0369a1;
             
+            /* Light mode code elements */
             --code-bg: #f1f5f9;
-            --code-text: #334155; 
+            --code-text: #000000; 
             --code-border: #cbd5e1;
             
             --success: #059669;
-            --logo-color: #0f172a;
-            --icon-color: #64748b;
+            
+            /* Enforced Black SVGs */
+            --logo-color: #000000;
+            --icon-color: #000000;
             
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
@@ -35,21 +41,27 @@
             /* Refined Dark Theme */
             --bg: #0b1120;
             --surface: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            
+            /* Enforced White Text */
+            --text-main: #ffffff;
+            --text-muted: #ffffff;
+            --tip-text: #ffffff;
+            
             --accent: #38bdf8;
             --border: #334155;
             --tip-bg: #0f172a;
             --tip-border: #38bdf8;
-            --tip-text: #bae6fd;
             
+            /* Dark mode code elements */
             --code-bg: #000000;
             --code-text: #4ade80; /* Classic terminal green */
             --code-border: #1e293b;
             
             --success: #10b981;
+            
+            /* Enforced White SVGs */
             --logo-color: #ffffff;
-            --icon-color: #94a3b8;
+            --icon-color: #ffffff;
             
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
@@ -286,7 +298,6 @@
         </div>
     </div>
 
-    <!-- Redesigned Starlink Flexbox Diagram -->
     <div class="diagram-container">
         <div class="diagram-title" id="diagram-title-text">Architecture Overview</div>
         
@@ -330,7 +341,7 @@
 </div>
 
 <script>
-    // Embedded SVG library for step instructions[cite: 2]
+    // Embedded SVG library for step instructions
     const svgs = {
         survey: `<svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5z"/><path d="M12 7v.01M8 11h8M12 11v6"/></svg>`,
         assembly: `<svg viewBox="0 0 24 24"><path d="M12 18v4M7 22h10M4 10.5a8.5 8.5 0 1 0 16 0"/><path d="M12 18L12 10.5"/></svg>`,
